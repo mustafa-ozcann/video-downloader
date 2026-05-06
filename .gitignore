@@ -1,0 +1,47 @@
+# macOS sistem dosyaları
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# İndirilen medya dosyaları (kişisel indirmeler)
+clip/
+*.mp3
+*.mp4
+*.mkv
+*.webm
+*.m4a
+*.flv
+*.avi
+*.mov
+*.wav
+*.aac
+*.opus
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+env/
+.env/
+.venv/
+
+# Ortam değişkenleri / gizli bilgiler
+.env
+.env.*
+*.secret
+
+# IDE dosyaları
+.vscode/
+.idea/
+*.swp
+*.swo
