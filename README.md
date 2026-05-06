@@ -32,25 +32,24 @@ YouTube videolarını farklı kalite ve formatlarda indirmeye yarayan **masaüst
 
 ## 🚀 Kurulum ve Çalıştırma
 
-### Hızlı Başlangıç (macOS/Linux)
+Projeyi kullanmaya başlamak çok basittir, terminal komutlarıyla uğraşmanıza gerek yoktur. Hazırlanan başlatıcı dosyalar, gerekli kütüphaneleri sizin için otomatik olarak kurar ve uygulamayı açar.
 
-```bash
-# Repo'yu klonlayın
-git clone https://github.com/KULLANICI_ADINIZ/REPO_ADINIZ.git
-cd REPO_ADINIZ
+### 📥 Dosyaları İndirme
+1. Bu sayfanın sağ üst köşesindeki yeşil **Code** butonuna tıklayın.
+2. **Download ZIP** seçeneği ile projeyi bilgisayarınıza indirin.
+3. İndirdiğiniz `.zip` dosyasını klasöre çıkartın.
 
-# Çalıştır (bağımlılıkları otomatik kurar ve uygulamayı başlatır)
-./run.sh
-```
+### 🍎 macOS / Linux İçin
+Çıkardığınız klasörün içindeki **`start_mac.command`** dosyasına **çift tıklayın**.
+- *Not: İlk çalıştırmada macOS uyarı verirse, dosyaya **sağ tıklayıp** menüden "Aç" (Open) seçeneğini kullanabilirsiniz.*
 
-> `run.sh` dosyasının çalıştırılabilir olduğundan emin olun:
-> ```bash
-> chmod +x run.sh
-> ```
+### 🪟 Windows İçin
+Çıkardığınız klasörün içindeki **`start_windows.bat`** dosyasına **çift tıklayın**.
+- *Not: Sisteminizde Python'un kurulu olması ve kurulum aşamasında "Add Python to PATH" (Python'u PATH'e Ekle) seçeneğinin işaretlenmiş olması gerekmektedir.*
 
 ---
 
-### Manuel Kurulum
+### 🔧 İleri Düzey (Manuel) Kurulum
 
 #### 1. ffmpeg Kurulumu
 
@@ -119,8 +118,9 @@ sudo apt install python3-tk
 
 ```
 .
-├── youtube_downloader.py   # Ana uygulama (tek dosya)
-├── run.sh                  # Otomatik kurulum & başlatma scripti
+├── youtube_downloader.py   # Ana uygulama
+├── start_windows.bat       # Windows için tek tıkla başlatıcı
+├── start_mac.command       # macOS/Linux için tek tıkla başlatıcı
 ├── requirements.txt        # Python bağımlılıkları
 └── README.md
 ```
