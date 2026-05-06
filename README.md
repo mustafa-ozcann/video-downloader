@@ -1,72 +1,138 @@
-# YouTube Video İndiricisi
+# 📥 YouTube Video İndiricisi
 
-yt-dlp kullanarak YouTube videolarını farklı formatlarda ve kalitelerde indiren GUI uygulaması.
+YouTube videolarını farklı kalite ve formatlarda indirmeye yarayan **masaüstü GUI uygulaması**. `yt-dlp` motorunu kullanan, sade ve kullanımı kolay bir araçtır.
 
-## Gereksinimler
+![Python](https://img.shields.io/badge/Python-3.7%2B-blue?logo=python)
+![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-- Python 3.7+
-- yt-dlp
-- tkinter (Python ile birlikte geliyor)
+---
 
-## Kurulum
+## ✨ Özellikler
 
-### 1. yt-dlp'i yükleyin
+| Özellik | Detay |
+|---|---|
+| 🎬 Video kalitesi | En İyi, 4K, 1080p, 720p, 480p, 360p |
+| 🎵 Ses indirme | MP3 formatında yüksek kalite |
+| 📊 Gerçek zamanlı ilerleme | Hız, kalan süre ve boyut göstergesi |
+| 📁 Klasör seçimi | İndirme konumunu özelleştirin |
+| ℹ️ Video bilgisi | İndirmeden önce başlık, kanal ve süre önizlemesi |
+| ❌ İptal desteği | İndirme sırasında kolayca iptal |
+
+---
+
+## 📋 Gereksinimler
+
+- **Python** 3.7 veya üzeri
+- **yt-dlp** — video indirme motoru
+- **ffmpeg** — video ve ses akışlarını birleştirmek için zorunlu
+- **tkinter** — Python ile birlikte gelir (genellikle ayrıca kurulum gerekmez)
+
+---
+
+## 🚀 Kurulum ve Çalıştırma
+
+### Hızlı Başlangıç (macOS/Linux)
+
+```bash
+# Repo'yu klonlayın
+git clone https://github.com/KULLANICI_ADINIZ/REPO_ADINIZ.git
+cd REPO_ADINIZ
+
+# Çalıştır (bağımlılıkları otomatik kurar ve uygulamayı başlatır)
+./run.sh
+```
+
+> `run.sh` dosyasının çalıştırılabilir olduğundan emin olun:
+> ```bash
+> chmod +x run.sh
+> ```
+
+---
+
+### Manuel Kurulum
+
+#### 1. ffmpeg Kurulumu
+
+**macOS (Homebrew):**
+```bash
+brew install ffmpeg
+```
+
+**Windows:**
+[https://ffmpeg.org/download.html](https://ffmpeg.org/download.html) adresinden indirip `PATH`'e ekleyin.
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt install ffmpeg
+```
+
+#### 2. Python Bağımlılıklarını Kurun
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Veya doğrudan:
+#### 3. Uygulamayı Çalıştırın
 
 ```bash
-pip install yt-dlp
+python3 youtube_downloader.py
 ```
 
-### 2. Programı çalıştırın
+---
 
-```bash
-python youtube_downloader.py
-```
+## 🖥️ Kullanım
 
-## Kullanım
+1. **URL Girin** → YouTube video linkini ilgili alana yapıştırın
+2. **Bilgi Al** → Butona tıklayarak video başlığını, kanalı ve süreyi görün
+3. **Kalite Seçin** → İstediğiniz çözünürlüğü veya ses modunu seçin
+4. **Klasör Seçin** *(isteğe bağlı)* → "Değiştir" ile özel kayıt konumu belirleyin
+5. **İndir** → İndirme başlar; ilerleme çubuğu ve log anlık güncellenir
+6. **Tamamlandı!** → Klasörü doğrudan uygulamadan açabilirsiniz
 
-1. **YouTube URL Girin**: Belirtilen alana YouTube video linkini yapıştırın
-2. **Formatları Yükle**: "Formatları Yükle" butonuna tıklayarak video formatlarını getirin
-3. **Kalite Seçin**: Açılan listeden istediğiniz format/kaliteyi seçin
-   - **Best**: En iyi kalite
-   - **720p, 480p, 360p**: Video kaliteleri
-   - **Audio Only**: Sadece ses
-4. **İndirme Klasörünü Seçin** (İsteğe bağlı): "Değiştir" butonuyla indirme klasörünü seçin
-5. **İndir**: "İndir" butonuna tıklayarak videoyu indirin
+---
 
-## Özellikler
+## 🔧 Sorun Giderme
 
-- 📺 Farklı video kaliteleri (720p, 480p, 360p vb.)
-- 🔊 Sadece ses indirme seçeneği
-- 🎬 Video formatı seçimi
-- 📁 Özel indirme klasörü seçimi
-- 📊 Durumu gerçek zamanlı gösterme
-- 🔍 Kalite filtreleme
-
-## Sorun Giderme
-
-**Hata: "yt-dlp yüklü değil"**
-```bash
-pip install yt-dlp --upgrade
-```
-
-**Video açılamıyor**
-- YouTube'un güvenlik güncellemeleri nedeniyle yt-dlp'i güncellemeyi deneyin:
+**`yt-dlp` veya `ffmpeg` bulunamadı hatası**
 ```bash
 pip install --upgrade yt-dlp
 ```
 
-**Yavaş indirme**
-- İnternet hızınızı kontrol edin
-- Daha düşük bir kalite seçmeyi deneyin
+**Video indirilemiyor / format hatası**
+YouTube zaman zaman değişiklik yapar; yt-dlp'yi güncellemeniz yeterlidir:
+```bash
+pip install --upgrade yt-dlp
+```
 
-## İpuçları
+**tkinter bulunamadı (Linux)**
+```bash
+sudo apt install python3-tk
+```
 
-- Çoğu video birden fazla format/kalite seçeneğine sahiptir
-- Format ID'si ve codec bilgileri listede gösterilmektedir
-- Durum penceresinde indirme ilerlemesini takip edebilirsiniz
+**Yavaş indirme**  
+İnternet hızınızı kontrol edin veya daha düşük bir kalite seçin.
+
+---
+
+## 📂 Proje Yapısı
+
+```
+.
+├── youtube_downloader.py   # Ana uygulama (tek dosya)
+├── run.sh                  # Otomatik kurulum & başlatma scripti
+├── requirements.txt        # Python bağımlılıkları
+└── README.md
+```
+
+---
+
+## ⚠️ Yasal Uyarı
+
+Bu araç yalnızca **telif hakkı bulunmayan veya kendi içeriğiniz olan** videoları indirmek için kullanılmalıdır. YouTube'un Hizmet Şartlarını ([Terms of Service](https://www.youtube.com/t/terms)) ihlal etmemeye dikkat edin. Kullanıcı, indirilen içeriklerin yasal sorumluluğunu kendisi üstlenir.
+
+---
+
+## 📄 Lisans
+
+MIT License — dilediğiniz gibi kullanabilir, değiştirebilir ve dağıtabilirsiniz.
