@@ -31,11 +31,11 @@ fi
 
 source "$PROJECT_DIR/venv/bin/activate"
 
-# ── 3. Bağımlılıkları yükle ─────────────────────────────────────
-echo "📦 Bağımlılıklar yükleniyor..."
+# ── 3. Python paketleri (Pillow dahil): pip bunlari PyPI'dan otomatik indirir ───
+echo "📦 Bağımlılıklar indirilip kuruluyor…"
 python3 -m pip install --upgrade pip -q
-pip install -r "$PROJECT_DIR/requirements.txt" -q
-echo "✅ Bağımlılıklar yüklendi."
+python3 -m pip install -q -r "$PROJECT_DIR/requirements.txt"
+echo "✅ Bağımlılıklar yüklendi (Pillow + yt-dlp Pip üzerinden alındı)."
 echo ""
 
 # ── 4. .app paketi oluştur ───────────────────────────────────────

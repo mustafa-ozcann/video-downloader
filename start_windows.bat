@@ -1,4 +1,9 @@
 @echo off
+setlocal EnableExtensions
+
+:: Her zaman bu betigin klasorunden calissin (cift tiklayinca garanti)
+cd /d "%~dp0"
+
 title YouTube Video Indiricisi
 echo ================================
 echo YouTube Video Indiricisi
@@ -27,10 +32,10 @@ if not exist "venv" (
 :: Sanal ortami aktif et
 call venv\Scripts\activate
 
-:: Bagimliliklari yukle
-echo Bagimliliklar kontrol ediliyor...
+:: Python paketleri (Pillow dahil): pip PyPI'dan otomatik indirir — ayri Elle kurulum gerektirmez
+echo Internet uzerinden bagimliliklar indiriliyor (bir kez bekleyebilirsiniz)...
 python -m pip install --upgrade pip -q
-pip install -r requirements.txt -q
+python -m pip install -q -r requirements.txt
 
 echo.
 echo Uygulama baslatiliyor...
