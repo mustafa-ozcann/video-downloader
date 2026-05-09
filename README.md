@@ -1,10 +1,27 @@
-# 📥 YouTube Video İndiricisi
+# 🎬 Video İndirici
 
-YouTube videolarını farklı kalite ve formatlarda indirmeye yarayan **masaüstü GUI uygulaması**. `yt-dlp` motorunu kullanan, sade ve kullanımı kolay bir araçtır.
+**YouTube, Instagram, TikTok, Twitter/X, Facebook ve 1000'den fazla platformu** destekleyen masaüstü video indirme uygulaması. `yt-dlp` motorunu kullanan, modern koyu temalı GUI ile çalışır — terminal komutlarına gerek yok.
 
 ![Python](https://img.shields.io/badge/Python-3.7%2B-blue?logo=python)
 ![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![Sites](https://img.shields.io/badge/Desteklenen%20Site-1000%2B-purple)
+
+---
+
+## 🌐 Desteklenen Platformlar
+
+Uygulama, `yt-dlp` sayesinde 1000'den fazla siteyi destekler. Öne çıkan platformlar:
+
+| Kategori | Platformlar |
+|---|---|
+| 📺 Video | YouTube, Vimeo, Dailymotion, Twitch, TED |
+| 📸 Sosyal Medya | Instagram, TikTok, Twitter / X, Facebook, Reddit |
+| 🎵 Müzik | SoundCloud, Bandcamp, Mixcloud, Audiomack |
+| 📰 Haber | BBC, CNN, Bloomberg, Reuters |
+| 🎓 Eğitim | Udemy, Coursera, LinkedIn Learning, Khan Academy |
+
+Desteklenen tüm siteler için: [yt-dlp desteklenen siteler listesi](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 
 ---
 
@@ -12,19 +29,22 @@ YouTube videolarını farklı kalite ve formatlarda indirmeye yarayan **masaüst
 
 | Özellik | Detay |
 |---|---|
-| 🎬 Video kalitesi | En İyi, 4K, 1080p, 720p, 480p, 360p |
-| 🎵 Ses indirme | MP3 formatında yüksek kalite |
-| 📊 Gerçek zamanlı ilerleme | Hız, kalan süre ve boyut göstergesi |
+| 🌐 1000+ site desteği | YouTube'dan Instagram'a, TikTok'tan BBC'ye tek araç |
+| 🎬 Çoklu video kalitesi | En İyi, 4K, 1080p, 720p, 480p, 360p |
+| 🎵 Ses indirme | MP3 formatında yüksek kalite (320kbps) |
+| 📊 Gerçek zamanlı ilerleme | Yüzde, hız, kalan süre ve dosya boyutu göstergesi |
+| 🔍 Video önizleme | İndirmeden önce başlık, kanal ve süreyi görün |
 | 📁 Klasör seçimi | İndirme konumunu özelleştirin |
-| ℹ️ Video bilgisi | İndirmeden önce başlık, kanal ve süre önizlemesi |
-| ❌ İptal desteği | İndirme sırasında kolayca iptal |
+| ⛔ İptal desteği | İndirme sırasında tek tıkla iptal |
+| 🎨 Modern koyu tema | Göz yormayan karanlık arayüz |
+| 🖥️ Çapraz platform | macOS, Windows ve Linux desteği |
 
 ---
 
 ## 📋 Gereksinimler
 
 - **Python** 3.7 veya üzeri
-- **yt-dlp** — video indirme motoru
+- **yt-dlp** — video indirme motoru (`pip install yt-dlp`)
 - **ffmpeg** — video ve ses akışlarını birleştirmek için zorunlu
 - **tkinter** — Python ile birlikte gelir (genellikle ayrıca kurulum gerekmez)
 
@@ -32,24 +52,30 @@ YouTube videolarını farklı kalite ve formatlarda indirmeye yarayan **masaüst
 
 ## 🚀 Kurulum ve Çalıştırma
 
-Projeyi kullanmaya başlamak çok basittir, terminal komutlarıyla uğraşmanıza gerek yoktur. Hazırlanan başlatıcı dosyalar, gerekli kütüphaneleri sizin için otomatik olarak kurar ve uygulamayı açar.
+Terminal komutlarıyla uğraşmanıza gerek yok. Hazırlanan başlatıcı dosyalar gerekli bağımlılıkları otomatik kurar.
 
-### 📥 Dosyaları İndirme
+### 📥 Projeyi İndirin
+
 1. Bu sayfanın sağ üst köşesindeki yeşil **Code** butonuna tıklayın.
-2. **Download ZIP** seçeneği ile projeyi bilgisayarınıza indirin.
-3. İndirdiğiniz `.zip` dosyasını klasöre çıkartın.
+2. **Download ZIP** ile projeyi indirin ve bir klasöre çıkartın.
 
-### 🍎 macOS / Linux İçin
-Çıkardığınız klasörün içindeki **`start_mac.command`** dosyasına **çift tıklayın**.
-- *Not: İlk çalıştırmada macOS uyarı verirse, dosyaya **sağ tıklayıp** menüden "Aç" (Open) seçeneğini kullanabilirsiniz.*
+### 🍎 macOS İçin
+
+Klasör içindeki **`start_mac.command`** dosyasına **çift tıklayın**.
+
+- Otomatik olarak sanal ortam oluşturur, bağımlılıkları kurar ve `/Applications/Video Downloader.app` paketini oluşturur.
+- İlk çalıştırmada macOS güvenlik uyarısı verirse dosyaya **sağ tıklayıp** "Aç" (Open) seçeneğini kullanın.
+- Kurulum sonrası Uygulamalar klasöründeki **Video Downloader** ikonuna çift tıklayarak açabilirsiniz.
 
 ### 🪟 Windows İçin
-Çıkardığınız klasörün içindeki **`start_windows.bat`** dosyasına **çift tıklayın**.
-- *Not: Sisteminizde Python'un kurulu olması ve kurulum aşamasında "Add Python to PATH" (Python'u PATH'e Ekle) seçeneğinin işaretlenmiş olması gerekmektedir.*
+
+Klasör içindeki **`start_windows.bat`** dosyasına **çift tıklayın**.
+
+- Python kurulumunda "Add Python to PATH" seçeneğinin işaretli olması gerekir.
 
 ---
 
-### 🔧 İleri Düzey (Manuel) Kurulum
+### 🔧 Manuel Kurulum
 
 #### 1. ffmpeg Kurulumu
 
@@ -58,8 +84,8 @@ Projeyi kullanmaya başlamak çok basittir, terminal komutlarıyla uğraşmanız
 brew install ffmpeg
 ```
 
-**Windows:**
-[https://ffmpeg.org/download.html](https://ffmpeg.org/download.html) adresinden indirip `PATH`'e ekleyin.
+**Windows:**  
+[ffmpeg.org/download.html](https://ffmpeg.org/download.html) adresinden indirip `PATH`'e ekleyin.
 
 **Linux (Ubuntu/Debian):**
 ```bash
@@ -82,11 +108,11 @@ python3 youtube_downloader.py
 
 ## 🖥️ Kullanım
 
-1. **URL Girin** → YouTube video linkini ilgili alana yapıştırın
+1. **URL Girin** → Herhangi bir desteklenen platform linkini yapıştırın
 2. **Bilgi Al** → Butona tıklayarak video başlığını, kanalı ve süreyi görün
-3. **Kalite Seçin** → İstediğiniz çözünürlüğü veya ses modunu seçin
-4. **Klasör Seçin** *(isteğe bağlı)* → "Değiştir" ile özel kayıt konumu belirleyin
-5. **İndir** → İndirme başlar; ilerleme çubuğu ve log anlık güncellenir
+3. **Kalite Seçin** → Videoya göre otomatik filtrelenen kalite seçeneklerinden birini seçin
+4. **Klasör Seçin** *(isteğe bağlı)* → Özel kayıt konumu belirleyin
+5. **İndir** → İndirme başlar; ilerleme çubuğu ve durum günlüğü anlık güncellenir
 6. **Tamamlandı!** → Klasörü doğrudan uygulamadan açabilirsiniz
 
 ---
@@ -96,10 +122,11 @@ python3 youtube_downloader.py
 **`yt-dlp` veya `ffmpeg` bulunamadı hatası**
 ```bash
 pip install --upgrade yt-dlp
+brew install ffmpeg   # macOS
 ```
 
-**Video indirilemiyor / format hatası**
-YouTube zaman zaman değişiklik yapar; yt-dlp'yi güncellemeniz yeterlidir:
+**Video indirilemiyor / format hatası**  
+Platformlar zaman zaman değişiklik yapar; yt-dlp'yi güncel tutun:
 ```bash
 pip install --upgrade yt-dlp
 ```
@@ -118,10 +145,12 @@ sudo apt install python3-tk
 
 ```
 .
-├── youtube_downloader.py   # Ana uygulama
+├── youtube_downloader.py   # Ana uygulama (tek dosya)
+├── start_mac.command       # macOS için tek tıkla kurulum + .app oluşturucu
 ├── start_windows.bat       # Windows için tek tıkla başlatıcı
-├── start_mac.command       # macOS/Linux için tek tıkla başlatıcı
 ├── requirements.txt        # Python bağımlılıkları
+├── app_icon.icns           # macOS uygulama ikonu
+├── app_icon.png            # Uygulama ikonu (PNG)
 └── README.md
 ```
 
@@ -129,7 +158,7 @@ sudo apt install python3-tk
 
 ## ⚠️ Yasal Uyarı
 
-Bu araç yalnızca **telif hakkı bulunmayan veya kendi içeriğiniz olan** videoları indirmek için kullanılmalıdır. YouTube'un Hizmet Şartlarını ([Terms of Service](https://www.youtube.com/t/terms)) ihlal etmemeye dikkat edin. Kullanıcı, indirilen içeriklerin yasal sorumluluğunu kendisi üstlenir.
+Bu araç yalnızca **telif hakkı bulunmayan veya kendi içeriğiniz olan** videoları indirmek için kullanılmalıdır. İçerik paylaşım platformlarının kullanım şartlarına uymak kullanıcının sorumluluğundadır. İndirilen içeriklerin yasal sorumluluğu kullanıcıya aittir.
 
 ---
 

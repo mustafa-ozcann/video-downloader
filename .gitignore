@@ -1,3 +1,6 @@
+# Yerel durum dosyaları
+.installed
+
 # macOS sistem dosyaları
 .DS_Store
 .DS_Store?
