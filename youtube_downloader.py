@@ -8,6 +8,7 @@ import os
 import re
 import sys
 import io
+import shutil
 import urllib.request
 from pathlib import Path
 
@@ -49,9 +50,28 @@ PREVIEW_MAX_W    = 360
 PREVIEW_MAX_H    = 202
 
 
+def _augment_path_for_common_tools():
+    """macOS .app / Finder ortamında /opt/homebrew/bin genelde PATH'te olmaz; ffmpeg bulunur."""
+    if sys.platform != "darwin":
+        return
+    extra = []
+    for d in ("/opt/homebrew/bin", "/usr/local/bin"):
+        if (Path(d) / "ffmpeg").is_file():
+            extra.append(d)
+    if not extra:
+        return
+    path = os.environ.get("PATH", "")
+    seen = {p for p in path.split(os.pathsep) if p}
+    prepend = [d for d in extra if d not in seen]
+    if not prepend:
+        return
+    os.environ["PATH"] = os.pathsep.join(prepend) + os.pathsep + path
+
+
 class ModernDownloader:
     def __init__(self, root):
         self.root = root
+        _augment_path_for_common_tools()
         self.root.title("Video İndirici")
         self.root.geometry("880x760")
         self.root.minsize(700, 600)
@@ -677,7 +697,7 @@ class ModernDownloader:
             self.root.after(0, lambda: self._preview_fallback("Kapak yok"))
             return
         if Image is None or ImageTk is None:
-            self.root.after(0, lambda: self._preview_fallback("Önizleme için Pillow gerekli (pip install Pillow)"))
+            self.root.after(0, lambda: self._preview_fallback("Kapak önizlemesi\nPillow yüklü değil"))
             return
         try:
             req = urllib.request.Request(
@@ -698,18 +718,43 @@ class ModernDownloader:
             self.root.after(0, lambda: self._preview_fallback("Kapak görseli\nyüklenemedi"))
 
     # ── Bağımlılık Kontrolü ────────────────────────────────────────────────
+    @staticmethod
+    def _ffmpeg_hint():
+        pl = sys.platform
+        if pl == "darwin":
+            return "brew install ffmpeg"
+        if pl == "win32":
+            return "ffmpeg.org adresinden kurun PATH'e ekleyin veya: winget install ffmpeg"
+        return "ffmpeg sistem paketleriyle kurun (örn. apt install ffmpeg)"
+
     def _check_deps(self):
-        for tool, install in [("yt-dlp", "pip install yt-dlp"),
-                               ("ffmpeg", "brew install ffmpeg")]:
-            try:
-                subprocess.run([tool, "--version"], capture_output=True, timeout=5)
-            except FileNotFoundError:
-                self.log(f"'{tool}' bulunamadı ({install})", warn=True)
+        missing = []
+
+        # PATH'te yoksa sürüm çağırmayı boşa denemeyelim
+        if not shutil.which("yt-dlp"):
+            missing.append("yt-dlp — pip ile: pip install yt-dlp · veya start_mac.command / start_windows.bat")
+
+        if not shutil.which("ffmpeg"):
+            missing.append(
+                f"ffmpeg — birleştirme için ({self._ffmpeg_hint()})"
+            )
 
         if Image is None or ImageTk is None:
-            self.log("Önizleme için Pillow gerekli: pip install Pillow", warn=True)
+            missing.append(
+                "Pillow — kapak önizlemesi için: proje klasöründeki venv içinde pip install -r requirements.txt"
+            )
 
-        self.log("Hazır — adresi yapıştırın, «Bilgi getir» ile devam edin.")
+        if missing:
+            self.log(
+                "Bazı araçlar yok veya PATH’te görünmüyor. Aşağıdakileri kurup uygulamayı yeniden açın:",
+                warn=True,
+            )
+            for line in missing:
+                self.log(f" • {line}", warn=True)
+        else:
+            self.log("Bağımlılıklar tamam (yt-dlp, ffmpeg, Pillow).")
+
+        self.log("Adresi yapıştırın, «Bilgi getir» ile devam edin.")
 
     # ── Kalite Seçimi ──────────────────────────────────────────────────────
     def _select_qual(self, idx):

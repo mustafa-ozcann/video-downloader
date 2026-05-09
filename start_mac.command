@@ -90,7 +90,7 @@ EOF
 cat > "${APP_PATH}/Contents/MacOS/launcher" << EOF
 #!/bin/bash
 exec > "/tmp/video_downloader_app.log" 2>&1
-export PATH="${PROJECT_DIR}/venv/bin:\$PATH"
+export PATH="${PROJECT_DIR}/venv/bin:/opt/homebrew/bin:/usr/local/bin:\$PATH"
 "${PROJECT_DIR}/venv/bin/python3" "${PROJECT_DIR}/youtube_downloader.py"
 EOF
 
