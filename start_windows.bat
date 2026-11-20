@@ -35,7 +35,12 @@ call venv\Scripts\activate
 :: Python paketleri (Pillow dahil): pip PyPI'dan otomatik indirir — ayri Elle kurulum gerektirmez
 echo Internet uzerinden bagimliliklar indiriliyor (bir kez bekleyebilirsiniz)...
 python -m pip install --upgrade pip -q
-python -m pip install -q -r requirements.txt
+python -m pip install -q -U -r requirements.txt
+
+where ffmpeg >nul 2>&1
+if %errorlevel% neq 0 echo [UYARI] ffmpeg bulunamadi: winget install ffmpeg
+where deno >nul 2>&1
+if %errorlevel% neq 0 echo [UYARI] deno bulunamadi (YouTube icin gerekli): winget install DenoLand.Deno
 
 echo.
 echo Uygulama baslatiliyor...

@@ -1,2 +1,4 @@
-yt-dlp>=2024.1.0
+yt-dlp[default]>=2026.10.26
 Pillow>=10.0.0
+certifi
+flask>=3.0

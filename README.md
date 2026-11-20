@@ -46,6 +46,7 @@ Desteklenen tüm siteler için: [yt-dlp desteklenen siteler listesi](https://git
 - **Python** 3.7 veya üzeri
 - **yt-dlp** — video indirme motoru (`pip install yt-dlp`)
 - **ffmpeg** — video ve ses akışlarını birleştirmek için zorunlu
+- **deno** — YouTube indirmeleri için gerekli (`brew install deno` / `winget install DenoLand.Deno`)
 - **tkinter** — Python ile birlikte gelir (genellikle ayrıca kurulum gerekmez)
 
 ---
@@ -66,6 +67,11 @@ Klasör içindeki **`start_mac.command`** dosyasına **çift tıklayın**.
 - Otomatik olarak sanal ortam oluşturur, bağımlılıkları kurar ve `/Applications/Video Downloader.app` paketini oluşturur.
 - İlk çalıştırmada macOS güvenlik uyarısı verirse dosyaya **sağ tıklayıp** "Aç" (Open) seçeneğini kullanın.
 - Kurulum sonrası Uygulamalar klasöründeki **Video Downloader** ikonuna çift tıklayarak açabilirsiniz.
+
+### 🌐 Web Sürümü (tarayıcıdan)
+
+**`start_web_mac.command`** (Windows: **`start_web_windows.bat`**) dosyasına çift tıklayın — tarayıcıda `http://127.0.0.1:8765` açılır.
+Aynı Wi-Fi'deki telefondan kullanmak için terminalde `./start_web_mac.command --lan` çalıştırın; ekrana yazılan adresi telefonda açın.
 
 ### 🪟 Windows İçin
 

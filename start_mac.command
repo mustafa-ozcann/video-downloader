@@ -34,8 +34,23 @@ source "$PROJECT_DIR/venv/bin/activate"
 # ── 3. Python paketleri (Pillow dahil): pip bunlari PyPI'dan otomatik indirir ───
 echo "📦 Bağımlılıklar indirilip kuruluyor…"
 python3 -m pip install --upgrade pip -q
-python3 -m pip install -q -r "$PROJECT_DIR/requirements.txt"
-echo "✅ Bağımlılıklar yüklendi (Pillow + yt-dlp Pip üzerinden alındı)."
+python3 -m pip install -q -U -r "$PROJECT_DIR/requirements.txt"
+echo "✅ Bağımlılıklar yüklendi/güncellendi (yt-dlp: $(python3 -m yt_dlp --version))."
+echo ""
+
+# ── 3b. ffmpeg (birleştirme) ve deno (YouTube JS doğrulaması) ────
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+for tool in ffmpeg deno; do
+    if command -v "$tool" &> /dev/null; then
+        echo "✅ $tool bulundu."
+    elif command -v brew &> /dev/null; then
+        echo "🔧 $tool kuruluyor (brew)…"
+        brew install "$tool" || echo "⚠️  $tool kurulamadı — elle kurun: brew install $tool"
+    else
+        echo "⚠️  $tool bulunamadı. Homebrew kurup şu komutu çalıştırın: brew install $tool"
+        echo "    (Homebrew: https://brew.sh)"
+    fi
+done
 echo ""
 
 # ── 4. .app paketi oluştur ───────────────────────────────────────
@@ -90,8 +105,14 @@ EOF
 cat > "${APP_PATH}/Contents/MacOS/launcher" << EOF
 #!/bin/bash
 exec > "/tmp/video_downloader_app.log" 2>&1
-export PATH="${PROJECT_DIR}/venv/bin:/opt/homebrew/bin:/usr/local/bin:\$PATH"
-"${PROJECT_DIR}/venv/bin/python3" "${PROJECT_DIR}/youtube_downloader.py"
+export PATH="${PROJECT_DIR}/venv/bin:/opt/homebrew/bin:/usr/local/bin:\$HOME/.deno/bin:\$PATH"
+if [ ! -x "${PROJECT_DIR}/venv/bin/python3" ] || [ ! -f "${PROJECT_DIR}/youtube_downloader.py" ]; then
+    /usr/bin/osascript -e 'display alert "Video Downloader" message "Proje klasörü bulunamadı veya taşındı:\n${PROJECT_DIR}\n\nKlasördeki start_mac.command dosyasını tekrar çalıştırın."'
+    exit 1
+fi
+"${PROJECT_DIR}/venv/bin/python3" "${PROJECT_DIR}/youtube_downloader.py" || \
+    /usr/bin/osascript -e 'display alert "Video Downloader açılamadı" message "Ayrıntılar: /tmp/video_downloader_app.log"'
+
 EOF
 
 chmod +x "${APP_PATH}/Contents/MacOS/launcher"

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video İndirici</title>
+<style>
+  :root {
+    --bg: #09090b; --surface: #121214; --elevated: #1c1c1f; --border: #27272a; --border-l: #3f3f46;
+    --text: #fafafa; --text2: #a1a1aa; --text3: #71717a;
+    --accent: #f4f4f5; --accent-fg: #09090b; --success: #22c55e; --danger: #ef4444; --warn: #eab308;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Segoe UI, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 26px; font-weight: 500; margin: 0; letter-spacing: -0.01em; }
+  .sub { color: var(--text3); margin: 4px 0 24px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .label { color: var(--text3); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .row { display: flex; gap: 10px; }
+  input[type=url] { flex: 1; min-width: 0; background: var(--elevated); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 12px 14px; font-size: 16px; outline: none; }
+  input[type=url]:focus { border-color: var(--border-l); }
+  button { font: inherit; border: 0; border-radius: 8px; cursor: pointer; padding: 12px 18px; white-space: nowrap; }
+  button:disabled { opacity: .45; cursor: default; }
+  .ghost { background: var(--elevated); color: var(--text2); border: 1px solid var(--border); }
+  .ghost:hover:not(:disabled) { color: var(--text); }
+  .primary { background: var(--accent); color: var(--accent-fg); font-weight: 600; width: 100%; padding: 14px; font-size: 16px; }
+  .primary:hover:not(:disabled) { background: #e4e4e7; }
+  .danger { background: var(--danger); color: #fff; font-weight: 600; }
+  .info { display: grid; grid-template-columns: 240px 1fr; gap: 16px; align-items: start; }
+  .thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; background: var(--elevated); display: block; }
+  .title { font-size: 17px; margin: 0 0 6px; overflow-wrap: anywhere; }
+  .meta { color: var(--text2); font-size: 13px; }
+  .badge { display: inline-block; background: var(--elevated); color: var(--text3); font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; }
+  .quals { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+  .qual { background: var(--elevated); color: var(--text2); padding: 10px 8px; text-align: center; }
+  .qual small { display: block; color: var(--text3); font-size: 11px; margin-top: 2px; }
+  .qual.sel { background: var(--text); color: var(--accent-fg); font-weight: 600; }
+  .qual.sel small { color: #52525b; }
+  .codec { display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+  .codec .qual { padding: 8px 14px; }
+  .bar { height: 8px; background: var(--elevated); border-radius: 4px; overflow: hidden; margin: 14px 0 8px; }
+  .bar > div { height: 100%; width: 0; background: var(--text); transition: width .3s; }
+  .prog { display: flex; justify-content: space-between; gap: 10px; color: var(--text2); font-size: 13px; }
+  .msg { border-radius: 8px; padding: 10px 12px; font-size: 14px; margin-top: 12px; overflow-wrap: anywhere; }
+  .msg.err { background: rgba(239,68,68,.1); color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+  .msg.warn { background: rgba(234,179,8,.08); color: #fde68a; border: 1px solid rgba(234,179,8,.25); }
+  .msg.ok { background: rgba(34,197,94,.08); color: #86efac; border: 1px solid rgba(34,197,94,.25); }
+  .msg a { color: inherit; }
+  .hidden { display: none !important; }
+  .foot { color: var(--text3); font-size: 12px; margin-top: 20px; text-align: center; }
+  @media (max-width: 560px) {
+    main { padding-top: 20px; }
+    .info { grid-template-columns: 1fr; }
+    .row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Video İndirici</h1>
+  <p class="sub">Linki yapıştırın — önizleme ve kalite tek ekranda. YouTube ve 1000+ site.</p>
+
+  <div id="toolWarn" class="msg warn hidden" style="margin:0 0 12px"></div>
+
+  <div class="card">
+    <div class="label">Video adresi</div>
+    <form id="urlForm" class="row">
+      <input id="url" type="url" placeholder="https://www.youtube.com/watch?v=…" required autocomplete="off">
+      <button id="fetchBtn" class="ghost" type="submit">Bilgi getir</button>
+    </form>
+    <div id="fetchErr" class="msg err hidden"></div>
+  </div>
+
+  <div id="infoCard" class="card hidden">
+    <div class="info">
+      <img id="thumb" class="thumb" alt="" referrerpolicy="no-referrer">
+      <div>
+        <span id="site" class="badge"></span>
+        <h2 id="title" class="title"></h2>
+        <div id="meta" class="meta"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="qualCard" class="card hidden">
+    <div class="label">Kalite</div>
+    <div id="quals" class="quals"></div>
+    <div class="codec">
+      <button id="h264Btn" class="qual sel" type="button">✓ H.264 · Premiere uyumlu</button>
+      <span id="h264Hint" class="meta"></span>
+    </div>
+  </div>
+
+  <div id="actCard" class="card hidden">
+    <div id="dlRow" class="row">
+      <button id="dlBtn" class="primary">İndirmeyi başlat</button>
+    </div>
+    <div id="progBox" class="hidden">
+      <div class="bar"><div id="barFill"></div></div>
+      <div class="prog"><span id="progText">Hazırlanıyor…</span><button id="cancelBtn" class="danger" style="padding:6px 14px">İptal</button></div>
+    </div>
+    <div id="dlMsg" class="msg hidden"></div>
+  </div>
+
+  <p class="foot" id="foot">Dosyalar tarayıcının indirme klasörüne kaydedilir.</p>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let info = null, selected = null, jobId = null, pollTimer = null;
+
+function show(el, on = true) { el.classList.toggle("hidden", !on); }
+function msg(el, kind, html) { el.className = "msg " + kind; el.innerHTML = html; show(el, !!html); }
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function fmtDur(s) {
+  s = Math.round(s || 0); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}` : `${m}:${String(x).padStart(2,"0")}`;
+}
+function errHtml(d) { return esc(d.error || "Bir hata oluştu.") + (d.hint ? `<br><b>İpucu:</b> ${esc(d.hint)}` : ""); }
+
+async function api(path, body) {
+  const r = await fetch(path, body === undefined ? {} : {
+    method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  let d = {}; try { d = await r.json(); } catch (_) {}
+  if (!r.ok) throw d;
+  return d;
+}
+
+// Ortam kontrolü (ffmpeg/deno, güncelleme)
+async function checkStatus() {
+  try {
+    const s = await api("/api/status");
+    const miss = [];
+    if (!s.tools.ffmpeg) miss.push("<b>ffmpeg</b> yok (video+ses birleştirme için): <code>brew install ffmpeg</code>");
+    if (!s.tools.deno) miss.push("<b>deno</b> yok (YouTube için gerekli): <code>brew install deno</code>");
+    if (s.updating) miss.push("yt-dlp arka planda güncelleniyor…");
+    msg($("toolWarn"), "warn", miss.join("<br>"));
+    if (s.version) $("foot").textContent = `Dosyalar tarayıcının indirme klasörüne kaydedilir · yt-dlp ${s.version}`;
+    if (s.updating) setTimeout(checkStatus, 3000);
+  } catch (_) {}
+}
+
+$("urlForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const url = $("url").value.trim();
+  if (!url) return;
+  $("fetchBtn").disabled = true; $("fetchBtn").textContent = "Yükleniyor…";
+  show($("fetchErr"), false); [$("infoCard"), $("qualCard"), $("actCard")].forEach(el => show(el, false));
+  try {
+    info = await api("/api/info", {url});
+    info.url = url;
+    renderInfo();
+  } catch (d) {
+    msg($("fetchErr"), "err", errHtml(d));
+    checkStatus();
+  } finally {
+    $("fetchBtn").disabled = false; $("fetchBtn").textContent = "Bilgi getir";
+  }
+});
+
+function renderInfo() {
+  $("thumb").src = info.thumbnail || ""; show($("thumb"), !!info.thumbnail);
+  $("site").textContent = info.site || "Video";
+  $("title").textContent = info.title;
+  const meta = [info.uploader, info.duration ? fmtDur(info.duration) : "",
+                info.views ? info.views.toLocaleString("tr-TR") + " görüntüleme" : ""].filter(Boolean);
+  $("meta").textContent = meta.join("  ·  ");
+  show($("infoCard"));
+
+  const box = $("quals"); box.innerHTML = "";
+  if (!info.presets.length) {
+    box.innerHTML = `<div class="meta">Bu video için indirilebilir format bulunamadı.</div>`;
+  }
+  info.presets.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.className = "qual" + (i === 0 ? " sel" : "");
+    b.innerHTML = `${esc(p.label)}<small>${esc(p.desc)}</small>`;
+    b.onclick = () => { selected = p.id; box.querySelectorAll(".qual").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); renderH264(); };
+    box.appendChild(b);
+  });
+  selected = info.presets[0]?.id ?? null;
+  renderH264();
+  show($("qualCard")); show($("actCard")); resetAction();
+  $("dlBtn").disabled = selected === null;
+}
+
+function resetAction() {
+  show($("dlRow")); show($("progBox"), false); show($("dlMsg"), false);
+  $("barFill").style.width = "0";
+}
+
+// H.264 anahtarı — sadece video indirmelerini etkiler; sadece ses (MP3) etkilenmez
+let h264 = localStorage.getItem("h264") !== "0";
+function renderH264() {
+  const b = $("h264Btn");
+  b.classList.toggle("sel", h264);
+  b.textContent = h264 ? "✓ H.264 · Premiere uyumlu" : "H.264 kapalı · orijinal codec";
+  const isAudio = info?.presets?.find(p => p.id === selected)?.audio;
+  $("h264Hint").textContent = isAudio ? "Sadece ses seçili — bu ayar ses (MP3) indirmelerini etkilemez."
+    : h264 ? "Videolar H.264 + AAC (.mp4) olarak kaydedilir." : "Video sitenin verdiği codec ile (VP9/AV1 olabilir) kaydedilir.";
+}
+$("h264Btn").addEventListener("click", () => { h264 = !h264; localStorage.setItem("h264", h264 ? "1" : "0"); renderH264(); });
+
+$("dlBtn").addEventListener("click", async () => {
+  if (selected === null) return;
+  show($("dlMsg"), false);
+  try {
+    const d = await api("/api/download", {url: info.url, preset: selected, title: info.title, h264});
+    jobId = d.job_id;
+    show($("dlRow"), false); show($("progBox"));
+    $("progText").textContent = "Hazırlanıyor…";
+    poll();
+  } catch (d) { msg($("dlMsg"), "err", errHtml(d)); }
+});
+
+$("cancelBtn").addEventListener("click", () => jobId && api(`/api/jobs/${jobId}/cancel`, {}).catch(() => {}));
+
+async function poll() {
+  clearTimeout(pollTimer);
+  let j;
+  try { j = await api(`/api/jobs/${jobId}`); }
+  catch (_) { pollTimer = setTimeout(poll, 1500); return; }
+
+  $("barFill").style.width = j.percent + "%";
+  if (j.status === "running") {
+    const parts = [j.percent > 0 ? `%${j.percent.toFixed(1)}` : j.stage];
+    if (j.total) parts.push(j.total);
+    if (j.speed) parts.push(j.speed);
+    if (j.eta) parts.push(`kalan ~${j.eta}`);
+    if (j.percent >= 100 && j.stage) parts[0] = j.stage;
+    if (j.converting) parts.splice(0, parts.length, `${j.stage}  ·  %${j.percent.toFixed(1)}`);
+    $("progText").textContent = parts.join("  ·  ");
+    pollTimer = setTimeout(poll, 700);
+    return;
+  }
+
+  show($("progBox"), false); show($("dlRow"));
+  if (j.status === "done") {
+    const href = `/api/jobs/${jobId}/file`;
+    msg($("dlMsg"), "ok", `Hazır: <b>${esc(j.filename)}</b><br>İndirme başlamadıysa <a href="${href}" download>buraya tıklayın</a>.`);
+    const a = document.createElement("a"); a.href = href; a.download = j.filename || "";
+    document.body.appendChild(a); a.click(); a.remove();
+  } else if (j.status === "cancelled") {
+    msg($("dlMsg"), "warn", "İndirme iptal edildi.");
+  } else {
+    msg($("dlMsg"), "err", errHtml(j));
+    checkStatus();
+  }
+}
+
+checkStatus();
+</script>
+</body>
+</html>
