@@ -125,7 +125,7 @@ async function api(path, body) {
   const r = await fetch(path, body === undefined ? {} : {
     method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
   let d = {}; try { d = await r.json(); } catch (_) {}
-  if (!r.ok) throw d;
+  if (!r.ok) { d._status = r.status; throw d; }
   return d;
 }
 
@@ -222,7 +222,14 @@ async function poll() {
   clearTimeout(pollTimer);
   let j;
   try { j = await api(`/api/jobs/${jobId}`); }
-  catch (_) { pollTimer = setTimeout(poll, 1500); return; }
+  catch (e) {
+    if (e && e._status === 404) {
+      show($("progBox"), false); show($("dlRow"));
+      msg($("dlMsg"), "err", "İndirme oturumu bulunamadı (sunucu yeniden başlatılmış olabilir). Lütfen tekrar deneyin.");
+      return;
+    }
+    pollTimer = setTimeout(poll, 1500); return;
+  }
 
   $("barFill").style.width = j.percent + "%";
   if (j.status === "running") {

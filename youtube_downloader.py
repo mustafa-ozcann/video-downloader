@@ -44,9 +44,12 @@ UPDATE_INTERVAL_SEC = 24 * 3600
 
 def _ytdlp_cmd():
     """yt-dlp'yi uygulamayı çalıştıran Python ile çağır (PATH'teki eski/başka bir kopya yerine).
-    Böylece otomatik güncelleme ile çalıştırılan sürüm daima aynıdır."""
+    Böylece otomatik güncelleme ile çalıştırılan sürüm daima aynıdır ve GGC yedek geçişi aktif olur."""
     try:
         import yt_dlp  # noqa: F401
+        wrapper = Path(__file__).resolve().parent / "ytdlp_cli.py"
+        if wrapper.is_file():
+            return [sys.executable, str(wrapper)]
         return [sys.executable, "-m", "yt_dlp"]
     except ImportError:
         return ["yt-dlp"]
@@ -64,6 +67,7 @@ H264_SORT = "res,fps,vcodec:h264,acodec:aac"
 def build_download_cmd(url, fmt, audio_only, out_tmpl, h264=True, path_file=None):
     """yt-dlp indirme komutunu oluşturur (masaüstü ve web sürümü ortak)."""
     cmd = _ytdlp_cmd() + ["--no-check-certificate", "--no-update", "--newline", "--no-playlist",
+                          "--concurrent-fragments", "8", "--http-chunk-size", "10M",
                           "-f", fmt, "-o", out_tmpl]
     if audio_only:
         cmd += ["--extract-audio", "--audio-format", "mp3", "--audio-quality", "0"]
@@ -96,12 +100,17 @@ def _probe_media(path):
 
 def _h264_encoders(height, fps):
     """Denenecek H.264 kodlayıcıları (önce donanım hızlandırmalı, sonra libx264)."""
+    mbps = 45 if height > 1440 else 24 if height > 1080 else 14 if height > 720 else 8 if height > 480 else 4
+    if fps > 40:
+        mbps = int(mbps * 1.5)
     if sys.platform == "darwin":
-        mbps = 45 if height > 1440 else 24 if height > 1080 else 14 if height > 720 else 8 if height > 480 else 4
-        if fps > 40:
-            mbps = int(mbps * 1.5)
         yield ["-c:v", "h264_videotoolbox", "-b:v", f"{mbps}M", "-profile:v", "high", "-allow_sw", "1"]
-    yield ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-profile:v", "high"]
+    elif sys.platform == "win32":
+        yield ["-c:v", "h264_nvenc", "-preset", "p4", "-rc", "vbr", "-cq", "19", "-b:v", "0", "-profile:v", "high"]
+        yield ["-c:v", "h264_qsv", "-preset", "medium", "-global_quality", "20", "-profile:v", "high"]
+        yield ["-c:v", "h264_amf", "-quality", "balanced", "-rc", "cqp", "-qp_i", "19", "-qp_p", "19", "-profile:v", "high"]
+        yield ["-c:v", "h264_mf", "-b:v", f"{mbps}M"]
+    yield ["-c:v", "libx264", "-preset", "fast", "-crf", "19", "-profile:v", "high"]
 
 
 def ensure_h264(path, on_progress=None, on_proc=None, is_cancelled=None):
@@ -1246,18 +1255,22 @@ class ModernDownloader:
             self.prog_lbl.configure(text="   ·   ".join(parts))
             return
 
-        if line.startswith("ERROR"):
+        if line.startswith("ERROR") or "[download] Got error:" in line:
             self._error_lines.append(line)
-            return
+            if line.startswith("ERROR"):
+                return
 
         if line.strip():
             self.log(line)
 
     def _report_error(self, stderr, rc=None):
         """yt-dlp hata çıktısını kullanıcıya anlaşılır bir mesajla gösterir."""
-        lines = [l for l in (stderr or "").strip().splitlines()
+        lines = [l.strip() for l in (stderr or "").strip().splitlines()
                  if l.strip() and "older than 90 days" not in l]
-        err_lines = [l for l in lines if l.startswith("ERROR")] or lines[-1:]
+        err_lines = [re.sub(r"^ERROR:\s*", "", l) for l in lines if l.startswith("ERROR")]
+        err_lines = [l for l in err_lines if l]
+        if not err_lines:
+            err_lines = [l for l in lines if "got error:" in l.lower()] or [l for l in lines if re.sub(r"^ERROR:\s*", "", l)]
         msg = err_lines[-1] if err_lines else f"İndirme başarısız (kod {rc})"
         self.log(f"Hata: {msg[:300]}", True)
 
@@ -1266,6 +1279,9 @@ class ModernDownloader:
             self.log("İpucu: Bu genelde yt-dlp'nin eski olmasından kaynaklanır. "
                      "Şimdi güncelleniyor — bitince tekrar deneyin.", True)
             self._auto_update_ytdlp(force=True)
+        elif any(k in low for k in ("invalid_session_id", "ssl:", "connection reset", "10054", "eof occurred in violation")):
+            self.log("İpucu: SSL/bağlantı hatası — GoodbyeDPI, VPN, proxy veya antivirüs HTTPS taraması "
+                     "googlevideo.com bağlantısını kesiyor olabilir. Geçici olarak kapatıp tekrar deneyin.", True)
         elif "ffmpeg" in low:
             self.log(f"İpucu: ffmpeg gerekli → {self._ffmpeg_hint()}", True)
         elif "unsupported url" in low:

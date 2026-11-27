@@ -56,8 +56,12 @@ def error_hint(msg):
     if "403" in low or "forbidden" in low or "sign in to confirm" in low or "nsig" in low:
         start_update(force=True)
         return "yt-dlp eski olabilir — şu an güncelleniyor, bir dakika sonra tekrar deneyin."
+    if any(k in low for k in ("invalid_session_id", "ssl:", "connection reset", "10054", "eof occurred in violation")):
+        return ("SSL/bağlantı hatası — GoodbyeDPI, VPN, proxy veya antivirüs HTTPS taraması "
+                "googlevideo.com bağlantısını kesiyor olabilir. Bunları geçici olarak kapatıp tekrar deneyin.")
     if "ffmpeg" in low:
-        return "ffmpeg gerekli: brew install ffmpeg"
+        cmd = "winget install ffmpeg" if sys.platform == "win32" else "brew install ffmpeg"
+        return f"ffmpeg gerekli: {cmd}"
     if "unsupported url" in low:
         return "Bu site veya link desteklenmiyor olabilir."
     if "private" in low or "unavailable" in low:
@@ -66,10 +70,17 @@ def error_hint(msg):
 
 
 def clean_error(text):
-    lines = [l for l in (text or "").strip().splitlines()
+    lines = [l.strip() for l in (text or "").strip().splitlines()
              if l.strip() and "older than 90 days" not in l]
-    errs = [l for l in lines if l.startswith("ERROR")] or lines[-1:]
-    return (errs[-1] if errs else "Bilinmeyen hata").removeprefix("ERROR: ")[:400]
+    cleaned = [re.sub(r"^ERROR:\s*", "", l) for l in lines if l.startswith("ERROR")]
+    cleaned = [l for l in cleaned if l]
+    if cleaned:
+        return cleaned[-1][:400]
+    got_err = [l for l in lines if "got error:" in l.lower()]
+    if got_err:
+        return got_err[-1][:400]
+    non_bare = [l for l in lines if re.sub(r"^ERROR:\s*", "", l)]
+    return (non_bare[-1] if non_bare else "Bilinmeyen hata")[:400]
 
 
 def available_presets(info):
@@ -167,8 +178,11 @@ def run_job(job):
                 job["speed"] = m.group(3) or ""
                 job["eta"] = "" if m.group(4) in (None, "Unknown") else m.group(4)
                 continue
-            if line.startswith("ERROR"):
+            if line.startswith("ERROR") or "[download] Got error:" in line:
                 errors.append(line)
+                if "Retrying" in line:
+                    m_retry = re.search(r"Retrying\s*\((\d+/\d+)\)", line)
+                    job["stage"] = f"Bağlantı hatası, tekrar deneniyor ({m_retry.group(1)})…" if m_retry else "Bağlantı hatası, tekrar deneniyor…"
             elif line.startswith("[Merger]") or line.startswith("[ExtractAudio]"):
                 job["stage"] = "Birleştiriliyor…" if "Merger" in line else "MP3'e dönüştürülüyor…"
             elif line.startswith("[download] Destination"):
@@ -204,8 +218,10 @@ def run_job(job):
             job["status"] = "done"
         else:
             msg = clean_error("\n".join(errors))
+            print(f"[job {job['id'][:8]}] error: {msg}", file=sys.stderr, flush=True)
             job.update(status="error", error=msg, hint=error_hint(msg))
     except Exception as e:
+        print(f"[job {job['id'][:8]}] exception: {e}", file=sys.stderr, flush=True)
         job.update(status="error", error=str(e), hint=None)
     finally:
         job["proc"] = None
@@ -224,6 +240,14 @@ def public_job(job):
 @app.get("/")
 def index():
     return send_from_directory(WEB_DIR, "index.html")
+
+
+@app.get("/favicon.ico")
+def favicon():
+    icon = BASE_DIR / "app_icon.png"
+    if icon.is_file():
+        return send_file(icon, mimetype="image/png")
+    return "", 204
 
 
 @app.get("/api/status")
